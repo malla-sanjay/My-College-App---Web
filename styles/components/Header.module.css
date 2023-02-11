@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.cdnfonts.com/css/bahnschrift");
+
+.header {
+  position: absolute;
+  left: 350px;
+  top: 0px;
+  display: flex;
+  margin-top: 40px;
+  justify-content: space-between;
+  width: 1200px;
+  height: 60px;
+  align-items: center;
+}
+
+.page_title {
+  all: initial;
+  font-family: "Bahnschrift";
+  font-style: normal;
+  font-weight: 00;
+  font-size: 32px;
+  line-height: 150%;
+  color: #22285e;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.seperation {
+  padding-right: 20px;
+}
+
+.day_time,
+.date {
+  font-family: "Poppins";
+  font-style: normal;
+  color: #22285e;
+}
+
+.date {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 150%;
+  padding-right: 5px;
+  text-align: right;
+}
+
+.day_time {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 150%;
+  font-feature-settings: "tnum" on, "lnum" on;
+}

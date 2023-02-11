@@ -1,13 +1,19 @@
 import { useDate } from "@/custom_hooks/useDate";
 import style from "@/styles/components/Header.module.css";
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const Header = () => {
   const { dayAndTime, formattedDate } = useDate();
+  const [college, setCollege] = useState("College Name");
+
+  useEffect(() => {
+    setCollege(localStorage.getItem("college"));
+  }, []);
+
   return (
     <div className={style.header}>
-      <div className={style.page_title}>Welcome to INDEX,</div>
+      <div className={style.page_title}>Welcome to {college},</div>
       <div className={style.container}>
         <div className={style.seperation}>
           <div className={style.day_time}>{dayAndTime}</div>

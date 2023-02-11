@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.cdnfonts.com/css/bahnschrift");
+
+.sidebar {
+  position: absolute;
+  height: 100vh;
+  left: 0px;
+  top: 0px;
+  width: 300px;
+  margin-right: 50px;
+  background: #1c1243;
+  border-radius: 0px 20px 20px 0px;
+}
+
+.admin {
+  margin-top: 40px;
+  padding: 10px;
+  margin-left: 35px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 50px;
+}
+.admin_label {
+  all: initial;
+  padding-left: 15px;
+  font-family: "Mulish";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 21px;
+  color: #ffffff;
+}
+
+.pages,
+.logout {
+  font-family: "Mulish";
+  font-style: normal;
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 21px;
+  color: #ffffff;
+  margin-left: 40px;
+}
+
+.overview,
+.manage,
+.classes,
+.events,
+.settings,
+.logout {
+  margin-top: 15px;
+  padding: 15px 15px 15px 15px;
+  display: flex;
+  width: 210px;
+  height: 50px;
+  align-items: center;
+  border-radius: 0px 20px 20px 0px;
+}
+
+.label {
+  padding-left: 20px;
+}
+
+.logout {
+  margin-top: 200px;
+}
+
+.overview:hover,
+.manage:hover,
+.events:hover,
+.classes:hover,
+.settings:hover,
+.logout:hover {
+  background-color: #be78f0;
+  color: #ffffff;
+  transition: 0.5s ease;
+}

@@ -1,13 +1,30 @@
-import Sidebar from "@/components/global_components/Sidebar";
-import Header from "@/components/global_components/Header";
 import "@/styles/globals.css";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
-export default function App({ Component, pageProps }) {
+const App = ({ Component, pageProps }) => {
+  const router = useRouter();
+
+  //Checks if user is logged in or not
+  useEffect(() => {
+    if (
+      !(
+        window.location.pathname == "/login" ||
+        window.location.pathname == "/signup" ||
+        window.location.pathname == "/forgotPassword"
+      )
+    ) {
+      if (!localStorage["authenticated"]) {
+        router.push("http://localhost:3000/login");
+      }
+    }
+  });
+
   return (
     <>
-      <Sidebar />
-      <Header />
       <Component {...pageProps} />
     </>
   );
-}
+};
+
+export default App;

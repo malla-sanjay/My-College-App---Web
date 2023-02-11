@@ -4,16 +4,23 @@ import style from "@/styles/components/Sidebar.module.css";
 import Link from "next/link";
 import { FaBook } from "react-icons/fa";
 import { BsFillCalendarEventFill } from "react-icons/bs";
-
 import { IconContext } from "react-icons";
+import { useState, useEffect } from "react";
 
 const Sidebar = () => {
+  //Logout function to clear local storage
+  const [admin, setAdmin] = useState("Admin");
+
+  useEffect(() => {
+    setAdmin(localStorage.getItem("admin"));
+  });
+
   return (
     <div className={style.sidebar}>
       <div className={style.admin}>
         <Image src="/Admin.png" alt="admin" height={51} width={51} />
         <div className={style.admin_label}>
-          <Link href={{}}>Admin</Link>
+          <Link href="/settings">{admin}</Link>
         </div>
       </div>
 
@@ -60,7 +67,11 @@ const Sidebar = () => {
 
       <div className={style.logout}>
         <Image src="/logout.png" alt="logout" height={16} width={18} />
-        <Link href="/" className={style.label}>
+        <Link
+          onClick={() => localStorage.clear()}
+          href="/login"
+          className={style.label}
+        >
           Logout
         </Link>
       </div>
