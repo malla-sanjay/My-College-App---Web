@@ -1,51 +1,58 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import DataCard2 from "./datacards/DataCard2";
+import DataCard3 from "./datacards/DataCard3";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NoDataCard from "./datacards/NoDataCard";
 
-const ManageBlock = () => {
-  //Blocks data get stored here
-  const [blocks, setBlocks] = useState([]);
+const ManageStudentGroup = () => {
+  //studentGroup data get stored here
+  const [studentGroups, setStudentGroups] = useState([]);
 
   //Refresh usestate to trigger useeffect
   const [refresh, setRefresh] = useState(true);
 
   //refresh data function after crud operations
   const refreshData = () => {
-    console.log("the page was refreshed");
     setRefresh(!refresh);
   };
 
   //Usestates for block obj
-  const [blockDetails, setBlockDetails] = useState({
-    block_id: "",
-    block_name: "",
+  const [studentGroupDetails, setStudentGroupDetails] = useState({
+    student_group_id: "",
+    college_grade: "",
+    no_of_students: "",
   });
 
   //Onchange function to interract with form
   const onChange = (e) => {
-    setBlockDetails({ ...blockDetails, [e.target.name]: e.target.value });
+    setStudentGroupDetails({
+      ...studentGroupDetails,
+      [e.target.name]: e.target.value,
+    });
   };
 
   //add block functoin
-  const addBlock = async (e) => {
+  const addStudentGroup = async (e) => {
     e.preventDefault();
     try {
       const body = {
-        block_id: blockDetails.block_id,
-        block_name: blockDetails.block_name,
+        student_group_id: studentGroupDetails.student_group_id,
+        college_grade: studentGroupDetails.college_grade,
         college_id: localStorage.getItem("id"),
+        no_of_students: studentGroupDetails.no_of_students,
       };
-      const response = await fetch("http://localhost:5000/block/addBlock", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("token"),
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        "http://localhost:5000/studentGroup/addStudentGroup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       const result = await response.json();
 
@@ -88,16 +95,18 @@ const ManageBlock = () => {
     }
   };
 
-  //remove block function
   const removeEntry = async (id) => {
-    const response = await fetch("http://localhost:5000/block/deleteBlock", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        token: localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ block_id: id }),
-    });
+    const response = await fetch(
+      "http://localhost:5000/studentGroup/deleteStudentGroup",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ student_group_id: id }),
+      }
+    );
 
     const result = await response.json();
     if (result.error) {
@@ -128,48 +137,51 @@ const ManageBlock = () => {
   };
 
   useEffect(() => {
-    //function to get all block and set it to blocks
-    const getAllBlocks = async () => {
+    //function to get all block and set it to studentGroups
+    const getStudentGroup = async () => {
       try {
         const college_id = localStorage.getItem("id");
-        const response = await fetch("http://localhost:5000/block/getBlocks", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            token: localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ college_id }),
-        });
-        const blocksData = await response.json();
-
-        setBlocks(blocksData.data);
+        const response = await fetch(
+          "http://localhost:5000/studentGroup/getStudentGroup",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
+            },
+            body: JSON.stringify({ college_id }),
+          }
+        );
+        const facultiesData = await response.json();
+        setStudentGroups(facultiesData.data);
       } catch (err) {
         console.log(err);
+        router.push("http://localhost:3000/login");
       }
     };
-    getAllBlocks();
+    getStudentGroup();
   }, [refresh]);
 
   const cards = () => {
     try {
-      if (blocks.length === 0) {
+      if (studentGroups.length === 0) {
         return <NoDataCard />;
       } else {
-        return blocks.map((block) => {
+        return studentGroups.map((row) => {
           return (
-            <DataCard2
-              key={block.block_id}
+            <DataCard3
+              key={row.student_group_id}
               removeEntry={removeEntry}
-              id={block.block_id}
-              data1={block.block_name}
-              data2={block.block_id}
+              id={row.student_group_id}
+              data1={row.college_grade}
+              data3={row.student_group_id}
+              data2={`No of Students: ${row.no_of_students}`}
             />
           );
         });
       }
     } catch (err) {
       console.log(err);
-      console.log("redirected from manage tab");
     }
   };
 
@@ -193,41 +205,65 @@ const ManageBlock = () => {
         </div>
         <div className="w-5/12 h-5/6 m-3 p-4 rounded-2xl">
           <form className=" p-12 py-0 update account flex flex-col">
-            <h1 className=" text-2xl font-semibold mb-6">Add Block</h1>
-            <label htmlFor="block_id" className="text-xl font-normal mb-3">
-              Block ID
+            <h1 className=" text-2xl font-semibold mb-6">Add Student Groups</h1>
+            <label
+              htmlFor="student_group_id"
+              className="text-xl font-normal mb-3"
+            >
+              Student Group ID
             </label>
             <input
               className="text-xl p-2 bg-purple-100 mb-2"
               type="text"
-              name="block_id"
-              id="block_id"
-              value={blockDetails.block_id}
-              placeholder="ID for Block"
+              name="student_group_id"
+              id="student_group_id"
+              value={studentGroupDetails.student_group_id}
+              placeholder="ID for Faculty"
               onChange={(e) => {
                 onChange(e);
               }}
             />
-            <label htmlFor="block_name" className="text-xl font-normal mb-3">
-              Block Name
+            <label htmlFor="college_grade" className="text-xl font-normal mb-3">
+              College Grade
+            </label>
+            <select
+              name="college_grade"
+              value={studentGroupDetails.college_grade}
+              onChange={(e) => {
+                onChange(e);
+              }}
+              className="text-xl p-2  bg-purple-100 mb-2"
+            >
+              <option value="">--Select Student Year--</option>
+              <option value="Year 1">Year 1</option>
+              <option value="Year 2">Year 2</option>
+              <option value="Year 3">Year 3</option>
+            </select>
+            <label
+              htmlFor="no_of_students"
+              className="text-xl font-normal mb-3"
+            >
+              No of Students
             </label>
             <input
               className="text-xl p-2 bg-purple-100 mb-2"
-              type="text"
-              name="block_name"
-              id="block_name"
-              value={blockDetails.block_name}
-              placeholder="Name of Block"
+              type="number"
+              name="no_of_students"
+              id="no_of_students"
+              value={studentGroupDetails.no_of_students}
+              placeholder="Number of Students"
               onChange={(e) => {
                 onChange(e);
+                console.log(studentGroupDetails);
               }}
             />
+
             <button
               type="button"
-              onClick={addBlock}
+              onClick={addStudentGroup}
               className="w-full px-3 py-4 mt-6 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
             >
-              Add New Block
+              Add New Student Group
             </button>
           </form>
         </div>
@@ -236,4 +272,4 @@ const ManageBlock = () => {
   );
 };
 
-export default ManageBlock;
+export default ManageStudentGroup;

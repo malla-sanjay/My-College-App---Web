@@ -1,8 +1,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import DataCard3vc from "./datacards/DataCard3vc";
+import DataCard3 from "./datacards/DataCard3";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NoDataCard from "./datacards/NoDataCard";
 
 const ManageModule = () => {
   //Modules data get stored here
@@ -13,9 +14,7 @@ const ManageModule = () => {
 
   //refresh data function after crud operations
   const refreshData = () => {
-    console.log("the page was refreshed");
     setRefresh(!refresh);
-    console.log(refresh);
   };
 
   //Usestates for block obj
@@ -93,7 +92,6 @@ const ManageModule = () => {
 
   //remove block function
   const removeEntry = async (id) => {
-    console.log("func triggered");
     const response = await fetch("http://localhost:5000/module/deleteModule", {
       method: "DELETE",
       headers: {
@@ -135,35 +133,47 @@ const ManageModule = () => {
   useEffect(() => {
     //function to get all block and set it to modules
     const getModule = async () => {
-      const college_id = localStorage.getItem("id");
-      const response = await fetch("http://localhost:5000/module/getModule", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("token"),
-        },
-        body: JSON.stringify({ college_id }),
-      });
-      const Data = await response.json();
+      try {
+        const college_id = localStorage.getItem("id");
+        const response = await fetch("http://localhost:5000/module/getModule", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+          body: JSON.stringify({ college_id }),
+        });
+        const Data = await response.json();
 
-      setModules(Data.data);
+        setModules(Data.data);
+      } catch (err) {
+        console.log(err);
+      }
     };
     getModule();
   }, [refresh]);
 
   const cards = () => {
-    return modules.map((row) => {
-      return (
-        <DataCard3vc
-          key={row.module_id}
-          removeEntry={removeEntry}
-          id={row.module_id}
-          data1={row.module_name}
-          data2={row.module_credits}
-          data3={row.module_id}
-        />
-      );
-    });
+    try {
+      if (modules.length === 0) {
+        return <NoDataCard />;
+      } else {
+        return modules.map((row) => {
+          return (
+            <DataCard3
+              key={row.module_id}
+              removeEntry={removeEntry}
+              id={row.module_id}
+              data1={row.module_name}
+              data2={`Credits: ${row.module_credits}`}
+              data3={row.module_id}
+            />
+          );
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -191,7 +201,7 @@ const ManageModule = () => {
               Module ID
             </label>
             <input
-              className="text-xl p-2 bg-purple-100"
+              className="text-xl p-2 bg-purple-100 mb-2"
               type="text"
               name="module_id"
               id="module_id"
@@ -222,7 +232,7 @@ const ManageModule = () => {
               Module Credits
             </label>
             <input
-              className="text-xl p-2 bg-purple-100"
+              className="text-xl p-2 bg-purple-100 mb-2"
               type="text"
               name="module_credits"
               id="module_credits"

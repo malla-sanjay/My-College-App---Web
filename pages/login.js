@@ -70,6 +70,37 @@ const login = () => {
         localStorage.setItem("college", data.user.college);
         localStorage.setItem("email", data.user.email);
 
+        //Check if events and classes file exist for the user or not if not create a new one
+        const classesResp = await fetch(
+          `http://localhost:5000/filesystem/classes/${localStorage.getItem(
+            "id"
+          )}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const eventResp = await fetch(
+          `http://localhost:5000/filesystem/events/${localStorage.getItem(
+            "id"
+          )}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        //just for checking delete afterwards
+        const eventResult = await eventResp.json();
+        const classesResult = await classesResp.json();
+        console.log(eventResult);
+        console.log(classesResult);
+
         //Redirect to root
         setTimeout(() => {
           router.push("http://localhost:3000");

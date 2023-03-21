@@ -1,51 +1,59 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import DataCard2 from "./datacards/DataCard2";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NoDataCard from "./datacards/NoDataCard";
+import DataCard4 from "./datacards/DataCard4";
 
 const ManageClassroom = () => {
-  //Blocks data get stored here
-  const [blocks, setBlocks] = useState([]);
+  //classroom data get stored here
+  const [classrooms, setClassrooms] = useState([]);
 
   //Refresh usestate to trigger useeffect
   const [refresh, setRefresh] = useState(true);
 
   //refresh data function after crud operations
   const refreshData = () => {
-    console.log("the page was refreshed");
     setRefresh(!refresh);
-    console.log(refresh);
   };
 
   //Usestates for block obj
-  const [blockDetails, setBlockDetails] = useState({
+  const [classroomDetails, setClassroomDetails] = useState({
+    class_id: "",
+    class_name: "",
+    class_capacity: "",
     block_id: "",
-    block_name: "",
   });
 
   //Onchange function to interract with form
   const onChange = (e) => {
-    setBlockDetails({ ...blockDetails, [e.target.name]: e.target.value });
+    setClassroomDetails({
+      ...classroomDetails,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  //add block functoin
-  const addBlock = async (e) => {
+  const addClassroom = async (e) => {
     e.preventDefault();
     try {
       const body = {
-        block_id: blockDetails.block_id,
-        block_name: blockDetails.block_name,
+        class_id: classroomDetails.class_id,
+        class_name: classroomDetails.class_name,
         college_id: localStorage.getItem("id"),
+        class_capacity: classroomDetails.class_capacity,
+        block_id: classroomDetails.block_id,
       };
-      const response = await fetch("http://localhost:5000/block/addBlock", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          token: localStorage.getItem("token"),
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        "http://localhost:5000/classroom/addClassroom",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       const result = await response.json();
 
@@ -88,17 +96,18 @@ const ManageClassroom = () => {
     }
   };
 
-  //remove block function
   const removeEntry = async (id) => {
-    console.log("func triggered");
-    const response = await fetch("http://localhost:5000/block/deleteBlock", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        token: localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ block_id: id }),
-    });
+    const response = await fetch(
+      "http://localhost:5000/classroom/deleteClassroom",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ class_id: id }),
+      }
+    );
 
     const result = await response.json();
     if (result.error) {
@@ -128,10 +137,13 @@ const ManageClassroom = () => {
     }
   };
 
-  useEffect(() => {
-    //function to get all block and set it to blocks
-    console.log("useeffect was triggerd");
-    const getAllBlocks = async () => {
+  //options for drop down menu loaded from apis
+  const [blockOptions, setBlockOptions] = useState([]);
+  const [capacityOptions, setCapacityOptions] = useState([]);
+
+  //function to load block id opitons
+  const loadBlockOptions = async () => {
+    try {
       const college_id = localStorage.getItem("id");
       const response = await fetch("http://localhost:5000/block/getBlocks", {
         method: "POST",
@@ -141,25 +153,100 @@ const ManageClassroom = () => {
         },
         body: JSON.stringify({ college_id }),
       });
-      const blocksData = await response.json();
 
-      setBlocks(blocksData.data);
+      const data = await response.json();
+      const blockData = [];
+
+      data.data.map((row) => {
+        blockData.push(row.block_id);
+      });
+
+      setBlockOptions(blockData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  //option for capacities loaded using api
+  const loadCapacityOptions = async () => {
+    try {
+      const college_id = localStorage.getItem("id");
+      const response = await fetch(
+        "http://localhost:5000/capacity/getCapacity",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+          body: JSON.stringify({ college_id }),
+        }
+      );
+
+      const data = await response.json();
+      const capacityData = [];
+
+      data.data.map((row) => {
+        capacityData.push(row.capacity_code);
+      });
+
+      setCapacityOptions(capacityData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    //function to get all block and set it to classrooms
+    const getClassroom = async () => {
+      try {
+        const college_id = localStorage.getItem("id");
+        const response = await fetch(
+          "http://localhost:5000/classroom/getClassroom",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
+            },
+            body: JSON.stringify({ college_id }),
+          }
+        );
+        const data = await response.json();
+        setClassrooms(data.data);
+      } catch (err) {
+        console.log(err);
+      }
     };
-    getAllBlocks();
+
+    //setting necessary data by calling the function
+    getClassroom();
+    loadBlockOptions();
+    loadCapacityOptions();
   }, [refresh]);
 
   const cards = () => {
-    return blocks.map((block) => {
-      return (
-        <DataCard2
-          key={block.block_id}
-          removeEntry={removeEntry}
-          id={block.block_id}
-          data1={block.block_name}
-          data2={block.block_id}
-        />
-      );
-    });
+    try {
+      if (classrooms.length === 0) {
+        return <NoDataCard />;
+      } else {
+        return classrooms.map((row) => {
+          return (
+            <DataCard4
+              key={row.class_id}
+              removeEntry={removeEntry}
+              id={row.class_id}
+              data1={row.class_name}
+              data3={`Class ID: ${row.class_id}`}
+              data2={`Size: ${row.class_capacity}`}
+              data4={`Block ID: ${row.block_id}`}
+            />
+          );
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -182,41 +269,86 @@ const ManageClassroom = () => {
         </div>
         <div className="w-5/12 h-5/6 m-3 p-4 rounded-2xl">
           <form className=" p-12 py-0 update account flex flex-col">
-            <h1 className=" text-2xl font-semibold mb-6">Add Block</h1>
-            <label htmlFor="block_id" className="text-xl font-normal mb-3">
+            <h1 className=" text-2xl font-semibold mb-6">Add Classroom</h1>
+            <label htmlFor="class_id" className="text-xl font-normal mb-3">
+              Classroom ID
+            </label>
+            <input
+              className="text-xl p-2 bg-purple-100 mb-2"
+              type="text"
+              name="class_id"
+              id="class_id"
+              value={classroomDetails.class_id}
+              placeholder="ID for Classroom"
+              onChange={(e) => {
+                onChange(e);
+              }}
+            />
+            <label htmlFor="class_name" className="text-xl font-normal mb-3">
+              Name of Classroom
+            </label>
+            <input
+              className="text-xl p-2 bg-purple-100 mb-2"
+              type="text"
+              name="class_name"
+              id="class_name"
+              value={classroomDetails.class_name}
+              placeholder="Name of classroom"
+              onChange={(e) => {
+                onChange(e);
+              }}
+            />
+
+            <label htmlFor="class_name" className="text-xl font-normal mb-3">
               Block ID
             </label>
-            <input
-              className="text-xl p-2 bg-purple-100"
-              type="text"
+            <select
               name="block_id"
-              id="block_id"
-              value={blockDetails.block_id}
-              placeholder="ID for Block"
+              value={classroomDetails.block_id}
               onChange={(e) => {
                 onChange(e);
               }}
-            />
-            <label htmlFor="block_name" className="text-xl font-normal mb-3">
-              Block Name
+              className="text-xl p-2  bg-purple-100 mb-2"
+            >
+              <option value="">--Select Block--</option>
+              {blockOptions.map((block_id) => {
+                return (
+                  <option key={block_id} value={block_id}>
+                    {block_id}
+                  </option>
+                );
+              })}
+            </select>
+            <label
+              htmlFor="class_capacity"
+              className="text-xl font-normal mb-3"
+            >
+              Classroom Capacity
             </label>
-            <input
-              className="text-xl p-2 bg-purple-100"
-              type="text"
-              name="block_name"
-              id="block_name"
-              value={blockDetails.block_name}
-              placeholder="Name of Block"
+            <select
+              name="class_capacity"
+              value={classroomDetails.class_capacity}
               onChange={(e) => {
                 onChange(e);
               }}
-            />
+              className="text-xl p-2  bg-purple-100 mb-2"
+            >
+              <option value="">--Select Capacity--</option>
+              {capacityOptions.map((data) => {
+                return (
+                  <option key={data} value={data}>
+                    {data}
+                  </option>
+                );
+              })}
+            </select>
+
             <button
               type="button"
-              onClick={addBlock}
+              onClick={addClassroom}
               className="w-full px-3 py-4 mt-6 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
             >
-              Add New Block
+              Add New Classroom
             </button>
           </form>
         </div>

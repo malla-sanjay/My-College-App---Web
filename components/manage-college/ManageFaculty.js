@@ -5,9 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NoDataCard from "./datacards/NoDataCard";
 
-const ManageBlock = () => {
+const ManageFaculty = () => {
   //Blocks data get stored here
-  const [blocks, setBlocks] = useState([]);
+  const [faculties, setFaculties] = useState([]);
 
   //Refresh usestate to trigger useeffect
   const [refresh, setRefresh] = useState(true);
@@ -19,26 +19,26 @@ const ManageBlock = () => {
   };
 
   //Usestates for block obj
-  const [blockDetails, setBlockDetails] = useState({
-    block_id: "",
-    block_name: "",
+  const [facultyDetails, setFacultyDetails] = useState({
+    faculty_id: "",
+    faculty_name: "",
   });
 
   //Onchange function to interract with form
   const onChange = (e) => {
-    setBlockDetails({ ...blockDetails, [e.target.name]: e.target.value });
+    setFacultyDetails({ ...facultyDetails, [e.target.name]: e.target.value });
   };
 
   //add block functoin
-  const addBlock = async (e) => {
+  const addFaculty = async (e) => {
     e.preventDefault();
     try {
       const body = {
-        block_id: blockDetails.block_id,
-        block_name: blockDetails.block_name,
+        faculty_id: facultyDetails.faculty_id,
+        faculty_name: facultyDetails.faculty_name,
         college_id: localStorage.getItem("id"),
       };
-      const response = await fetch("http://localhost:5000/block/addBlock", {
+      const response = await fetch("http://localhost:5000/faculty/addFaculty", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,14 +90,17 @@ const ManageBlock = () => {
 
   //remove block function
   const removeEntry = async (id) => {
-    const response = await fetch("http://localhost:5000/block/deleteBlock", {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        token: localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ block_id: id }),
-    });
+    const response = await fetch(
+      "http://localhost:5000/faculty/deleteFaculty",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+        body: JSON.stringify({ faculty_id: id }),
+      }
+    );
 
     const result = await response.json();
     if (result.error) {
@@ -128,48 +131,50 @@ const ManageBlock = () => {
   };
 
   useEffect(() => {
-    //function to get all block and set it to blocks
-    const getAllBlocks = async () => {
+    //function to get all block and set it to faculties
+    const getFaculties = async () => {
       try {
         const college_id = localStorage.getItem("id");
-        const response = await fetch("http://localhost:5000/block/getBlocks", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            token: localStorage.getItem("token"),
-          },
-          body: JSON.stringify({ college_id }),
-        });
-        const blocksData = await response.json();
-
-        setBlocks(blocksData.data);
+        const response = await fetch(
+          "http://localhost:5000/faculty/getFaculty",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
+            },
+            body: JSON.stringify({ college_id }),
+          }
+        );
+        const facultiesData = await response.json();
+        setFaculties(facultiesData.data);
       } catch (err) {
         console.log(err);
+        router.push("http://localhost:3000/login");
       }
     };
-    getAllBlocks();
+    getFaculties();
   }, [refresh]);
 
   const cards = () => {
     try {
-      if (blocks.length === 0) {
+      if (faculties.length === 0) {
         return <NoDataCard />;
       } else {
-        return blocks.map((block) => {
+        return faculties.map((row) => {
           return (
             <DataCard2
-              key={block.block_id}
+              key={row.faculty_id}
               removeEntry={removeEntry}
-              id={block.block_id}
-              data1={block.block_name}
-              data2={block.block_id}
+              id={row.faculty_id}
+              data1={row.faculty_name}
+              data2={row.faculty_id}
             />
           );
         });
       }
     } catch (err) {
       console.log(err);
-      console.log("redirected from manage tab");
     }
   };
 
@@ -193,41 +198,41 @@ const ManageBlock = () => {
         </div>
         <div className="w-5/12 h-5/6 m-3 p-4 rounded-2xl">
           <form className=" p-12 py-0 update account flex flex-col">
-            <h1 className=" text-2xl font-semibold mb-6">Add Block</h1>
-            <label htmlFor="block_id" className="text-xl font-normal mb-3">
-              Block ID
+            <h1 className=" text-2xl font-semibold mb-6">Add Faculties</h1>
+            <label htmlFor="faculty_id" className="text-xl font-normal mb-3">
+              Faculty ID
             </label>
             <input
               className="text-xl p-2 bg-purple-100 mb-2"
               type="text"
-              name="block_id"
-              id="block_id"
-              value={blockDetails.block_id}
-              placeholder="ID for Block"
+              name="faculty_id"
+              id="faculty_id"
+              value={facultyDetails.faculty_id}
+              placeholder="ID for Faculty"
               onChange={(e) => {
                 onChange(e);
               }}
             />
-            <label htmlFor="block_name" className="text-xl font-normal mb-3">
-              Block Name
+            <label htmlFor="faculty_name" className="text-xl font-normal mb-3">
+              Faculty Name
             </label>
             <input
               className="text-xl p-2 bg-purple-100 mb-2"
               type="text"
-              name="block_name"
-              id="block_name"
-              value={blockDetails.block_name}
-              placeholder="Name of Block"
+              name="faculty_name"
+              id="faculty_name"
+              value={facultyDetails.faculty_name}
+              placeholder="Name of Faculty"
               onChange={(e) => {
                 onChange(e);
               }}
             />
             <button
               type="button"
-              onClick={addBlock}
+              onClick={addFaculty}
               className="w-full px-3 py-4 mt-6 text-white bg-indigo-500 rounded-md focus:bg-indigo-600 focus:outline-none"
             >
-              Add New Block
+              Add New Faculty
             </button>
           </form>
         </div>
@@ -236,4 +241,4 @@ const ManageBlock = () => {
   );
 };
 
-export default ManageBlock;
+export default ManageFaculty;

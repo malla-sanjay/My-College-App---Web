@@ -1,7 +1,11 @@
 import React from "react";
 import ManageBlock from "./ManageBlock";
+import ManageCapacity from "./ManageCapacity";
 import ManageClassroom from "./ManageClassroom";
+import ManageFaculty from "./ManageFaculty";
 import ManageModule from "./ManageModule";
+import ManageStudentGroup from "./ManageStudentGroup";
+import ManageTeachers from "./ManageTeachers";
 
 const ManageContent = ({ tab }) => {
   switch (tab) {
@@ -18,9 +22,17 @@ const ManageContent = ({ tab }) => {
         </div>
       );
     case 3:
-      return <h1>value is 3</h1>;
+      return (
+        <div className="h-full">
+          <ManageFaculty />
+        </div>
+      );
     case 4:
-      return <h1>value is 4</h1>;
+      return (
+        <div className="h-full">
+          <ManageTeachers />
+        </div>
+      );
     case 5:
       return (
         <div className="h-full">
@@ -28,9 +40,17 @@ const ManageContent = ({ tab }) => {
         </div>
       );
     case 6:
-      return <h1>value is 6</h1>;
+      return (
+        <div className="h-full">
+          <ManageCapacity />
+        </div>
+      );
     case 7:
-      return <h1>value is 7</h1>;
+      return (
+        <div className="h-full">
+          <ManageStudentGroup />
+        </div>
+      );
     default:
       console.log("Value is not between 1 and 7, defaulting to 1");
       return <h1>value is default 1</h1>;
